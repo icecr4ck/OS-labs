@@ -1,0 +1,51 @@
+sudo apt-get update
+sudo apt-get install linux-source
+tar jxvf /usr/src/linux-source-3.13.0.tar.bz2 linux-source-3.13.0
+
+make oldconfig pour recompiler le noyau
+Il faut recompiler le noyau au moins 3 fois: prend du temps...
+Il faut peut être enlever certains includes selon la version du kernel
+
+// Commandes pour configurer le noyau
+cp /boot/config-3.13.0-74-generic .config
+make oldconfig
+lspcu pour checker le nombre de processus dispos
+// compilation du noyau
+make -j9
+make modules -j9
+// installation du noyau et des modules
+sudo make modules_install
+sudo make install
+// Check si le noyau a bien été installé
+uname -r 
+
+Partie 2
+// Lien symbolique avec le répertoire source du noyau
+ln -s linux-source-3.13.0/ noyauSource
+// ajout du syscall dans la table 32 bits (num 355)
+vim noyauSource/arch/x86/syscalls/syscall_32.tbl
+// ajout de la signature dans le syscall header
+vim noyauSource/include/linux/syscalls.h
+// ajout fichier source syscall
+mkdir noyauSource/partie2
+vim noyauSource/partie2/syscall1_log710.c
+// makefile pour le syscall
+vim noyauSource/partie2/Makefile
+// ajout du répertoire /partie2 à l'attribut core-y
+vim noyauSource/Makefile
+// compilation du syscall
+make M=partie2
+// recompilation et installation du noyau
+make -j9
+sudo make install
+reboot
+vim foncTestAS1.c
+gcc fonctTestAS1.c -o fonctTestAS1
+sudo cat /var/log/syslog
+
+Partie 3 
+cd noyauSource
+mkdir partie3
+vim partie3/procdata.h
+vim partie3/procdata.c
+Pareil que partie 2 (num 356)
